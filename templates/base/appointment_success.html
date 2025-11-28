@@ -1,0 +1,10 @@
+{% extends 'partials/base.html' %}
+{% block content %}
+<section class="container mt-5">
+    <div class="alert alert-success text-center">
+        <h2>Appointment Booked Successfully!</h2>
+        <p>Your appointment ID is: <b>{{ appointment_id }}</b></p>
+        <a href="{% url 'base:index' %}" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+</section>
+{% endblock content %}

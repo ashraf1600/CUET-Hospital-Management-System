@@ -1,0 +1,157 @@
+<div class="col-lg-3 col-md-4 col-12">
+    <nav class="navbar navbar-expand-md shadow-sm mb-4 mb-lg-0 sidenav border rounded" style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);">
+        <a class="d-xl-none d-lg-none d-md-none text-inherit fw-bold text-decoration-none text-white p-3" href="#"> 
+            <i class="fas fa-bars me-2"></i> Menu 
+        </a>
+        <button class="navbar-toggler d-md-none icon-shape icon-sm rounded bg-white text-primary m-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidenav" aria-controls="sidenav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="fas fa-bars"></span>
+        </button>
+
+        <div class="collapse navbar-collapse p-3" id="sidenav">
+            <div class="navbar-nav flex-column">
+                <!-- Student Profile Section -->
+                <div class="d-flex align-items-center mb-4 p-3 bg-white rounded-3 shadow-sm">
+                    {% if request.user.patient.image %}
+                    <img src="{{ request.user.patient.image.url }}" alt="avatar" class="rounded-circle avatar-xl" style="width: 70px; height: 70px; object-fit: cover" />
+                    {% else %}
+                    <img src="https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg" alt="avatar" class="rounded-circle avatar-xl" style="width: 70px; height: 70px; object-fit: cover" />
+                    {% endif %}
+                    <div class="ms-3">
+                        <h5 class="mb-0 fw-bold text-dark">{{ request.user.patient.first_name }} {{ request.user.patient.last_name }}</h5>
+                        <p class="mb-0 text-muted small">{{ request.user.patient.student_id }}</p>
+                        <p class="mb-0 text-muted small">{{ request.user.patient.department }}</p>
+                        <span class="badge bg-primary mt-1">CUET Student</span>
+                    </div>
+                </div>
+
+                <!-- Main Navigation -->
+                <span class="navbar-header mb-2 text-white fw-bold">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </span>
+                <ul class="list-unstyled ms-n2 mb-4">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white d-flex align-items-center py-2 rounded-3" href="{% url 'patient:dashboard' %}">
+                            <i class="fas fa-home me-3"></i> 
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white d-flex align-items-center py-2 rounded-3" href="{% url 'patient:appointments' %}">
+                            <i class="fas fa-calendar-check me-3"></i>
+                            <span>Appointments</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white d-flex align-items-center py-2 rounded-3" href="{% url 'patient:notifications' %}">
+                            <i class="fas fa-bell me-3"></i>
+                            <span>Notifications</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Medical Records -->
+                <span class="navbar-header mb-2 text-white fw-bold">
+                    <i class="fas fa-file-medical me-2"></i>Medical Records
+                </span>
+                <ul class="list-unstyled ms-n2 mb-4">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white d-flex align-items-center py-2 rounded-3" href="{% url 'patient:e_booklet' %}">
+                            <i class="fas fa-book-medical me-3"></i>
+                            <span>E-Booklet</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Quick Actions -->
+                <span class="navbar-header mb-2 text-white fw-bold">
+                    <i class="fas fa-bolt me-2"></i>Quick Actions
+                </span>
+                <ul class="list-unstyled ms-n2 mb-4">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white d-flex align-items-center py-2 rounded-3" href="{% url 'base:index' %}">
+                            <i class="fas fa-plus-circle me-3"></i>
+                            <span>Book New Appointment</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Account Settings -->
+                <span class="navbar-header mb-2 text-white fw-bold">
+                    <i class="fas fa-cog me-2"></i>Account Settings
+                </span>
+                <ul class="list-unstyled ms-n2 mb-0">
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white d-flex align-items-center py-2 rounded-3" href="{% url 'patient:profile' %}">
+                            <i class="fas fa-user-edit me-3"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white d-flex align-items-center py-2 rounded-3" href="{% url 'userauths:sign-out' %}">
+                            <i class="fas fa-sign-out-alt me-3"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- CUET Badge -->
+                <div class="mt-4 p-3 bg-white rounded-3 text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <i class="fas fa-hospital text-primary fs-4 me-2"></i>
+                        <span class="fw-bold text-dark">CUET HMS</span>
+                    </div>
+                    <small class="text-muted">Student Medical Portal</small>
+                    <div class="mt-2">
+                        <span class="badge bg-primary">Secure & Private</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<style>
+.sidenav {
+    border: none !important;
+    background: linear-gradient(135deg, rgba(4, 28, 63, 1) 0%, #080114ff 100%) !important;
+}
+
+.navbar-header {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    display: block;
+    color: rgba(255,255,255,0.9);
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 2px 0;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    background: rgba(255,255,255,0.15) !important;
+    color: white !important;
+    transform: translateX(5px);
+}
+
+.nav-link.active {
+    background: rgba(255,255,255,0.2) !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+}
+
+.rounded-3 {
+    border-radius: 12px !important;
+}
+</style>

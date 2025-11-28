@@ -1,0 +1,421 @@
+{% extends 'partials/base.html' %} 
+{% block content %}
+
+<!-- Hero Section -->
+<section class="container-fluid bg-primary bg-gradient py-5" style="background: linear-gradient(135deg, #a0bde7ff 0%, #7540c9ff 100%);">
+    <div class="container">
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="col-12 col-lg-7 p-4 text-white">
+                <h1 class="display-4 fw-bold mt-5">
+                    <span class="text-warning" style="color: #bda107ff !important;"><b>CUET</b></span> 
+                    <span class="text-white">Hospital Management System</span>
+                </h1>
+                <p class="fs-4 mt-4 text-white">Providing exceptional healthcare services to CUET students and staff. Your health is our priority with advanced medical facilities and expert doctors.</p>
+                <div class="d-flex align-items-center gap-2 mt-5 flex-wrap">
+                    {% if not request.user.is_authenticated %}
+                    <a href="{% url 'userauths:sign-up' %}?type=Patient" class="btn btn-warning btn-lg">
+                        <i class="fas fa-user-graduate me-2"></i>Student Registration
+                    </a>
+                    {% endif %}
+                    <a href="#services" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                    </a>
+                    {% if request.user.is_authenticated and request.user.user_type == "Patient" %}
+                    <a href="{% url 'patient:dashboard' %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i>Student Dashboard
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="row mt-5 text-center">
+                    <div class="col-md-3 col-6">
+                        <h3 class="fw-bold" style="color: #FFD700 !important;">{{ services.count }}+</h3>
+                        <p class="mb-0 text-white">Medical Services</p>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <h3 class="fw-bold" style="color: #FFD700 !important;">
+                            Multiple
+                        </h3>
+                        <p class="mb-0 text-white">Expert Doctors</p>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <h3 class="fw-bold" style="color: #FFD700 !important;">24/7</h3>
+                        <p class="mb-0 text-white">Emergency Service</p>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <h3 class="fw-bold" style="color: #FFD700 !important;">100%</h3>
+                        <p class="mb-0 text-white">Student Focused</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-5">
+                <img class="img-fluid mt-4 shadow-lg rounded-3" 
+                     style="width: 100%; height: 400px; object-fit: cover;" 
+                     src="https://lh3.googleusercontent.com/gps-cs-s/AG0ilSyXMkkVVfsLagkiK1qtpn_mp1sy1ndlS8GDpTPAPCCoAoYRFKuy8Nc2VzBb0jhyG9Gvgdom8J8CJL0sewWAmkFPhzUZfnfewbEKuI4QbjaZvJ7mhzC7bxtRD-o2ByzRlJB2SAmo3K6dZrEY=s680-w680-h510-rw" 
+                     alt="CUET Medical Center" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Available Doctors Today Section -->
+{% if doctors_with_slots %}
+<section class="container mt-5">
+    <div class="text-center py-4">
+        <h2 class="fw-bold text-primary">
+            <i class="fas fa-calendar-check me-2"></i>Available Doctors Today
+        </h2>
+        <p class="text-muted fs-5">
+            <i class="fas fa-calendar-day me-1"></i>{{ today|date:"l, F d, Y" }}
+        </p>
+    </div>
+
+    <div class="row">
+        {% for item in doctors_with_slots %}
+        <div class="col-lg-6 col-xl-4 mb-4">
+            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-left: 4px solid #7540c9ff !important;">
+                <div class="card-body">
+                    <!-- Doctor Header -->
+                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        {% if item.doctor.image %}
+                        <img src="{{ item.doctor.image.url }}" 
+                             alt="{{ item.doctor.full_name }}" 
+                             class="rounded-circle me-3"
+                             style="width: 70px; height: 70px; object-fit: cover; border: 3px solid #7540c9ff;">
+                        {% else %}
+                        <div class="rounded-circle me-3 d-flex align-items-center justify-content-center text-white fw-bold"
+                             style="width: 70px; height: 70px; background: linear-gradient(135deg, #a0bde7ff, #7540c9ff); font-size: 1.5rem; border: 3px solid #7540c9ff;">
+                            {{ item.doctor.full_name|first }}
+                        </div>
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <h5 class="card-title mb-1 fw-bold text-dark">{{ item.doctor.full_name }}</h5>
+                            <p class="text-primary mb-0 fw-semibold">
+                                <i class="fas fa-stethoscope me-1"></i>{{ item.doctor.specialization|default:"General Physician" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Doctor Details -->
+                    <div class="doctor-info mb-3">
+                        {% if item.doctor.qualifications %}
+                        <p class="mb-2 text-muted small">
+                            <i class="fas fa-graduation-cap text-primary me-2"></i>
+                            <strong>Qualifications:</strong> {{ item.doctor.qualifications }}
+                        </p>
+                        {% endif %}
+                        
+                        {% if item.doctor.years_of_experience %}
+                        <p class="mb-2 text-muted small">
+                            <i class="fas fa-briefcase text-primary me-2"></i>
+                            <strong>Experience:</strong> {{ item.doctor.years_of_experience }} years
+                        </p>
+                        {% endif %}
+                        
+                        {% if item.doctor.mobile %}
+                        <p class="mb-2 text-muted small">
+                            <i class="fas fa-phone text-primary me-2"></i>
+                            <strong>Contact:</strong> {{ item.doctor.mobile }}
+                        </p>
+                        {% endif %}
+
+                        {% if item.doctor.bio %}
+                        <p class="mb-0 text-muted small">
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            {{ item.doctor.bio|truncatechars:80 }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Available Slots -->
+                    <div class="slots-section">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 fw-bold text-dark">
+                                <i class="fas fa-clock text-primary me-1"></i>Available Time Slots
+                            </h6>
+                            <span class="badge rounded-pill" style="background: linear-gradient(135deg, #a0bde7ff, #7540c9ff);">
+                                {{ item.slot_count }} slot{{ item.slot_count|pluralize }}
+                            </span>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            {% for slot in item.slots %}
+                            <span class="badge text-white px-3 py-2" 
+                                  style="background: linear-gradient(135deg, #7540c9ff, #a0bde7ff); font-size: 0.85rem;">
+                                <i class="fas fa-clock me-1"></i>
+                                {{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}
+                            </span>
+                            {% endfor %}
+                        </div>
+
+                        {% if request.user.is_authenticated and request.user.user_type == "Patient" %}
+                        {% comment %} <a href="{% url 'base:book_appointment' s.id item.doctor.id %}" 
+                           class="btn btn-primary w-100 fw-semibold">
+                            <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                        </a> {% endcomment %}
+                        {% else %}
+                        <a href="{% url 'userauths:sign-up' %}?type=Patient" 
+                           class="btn btn-warning w-100 fw-semibold">
+                            <i class="fas fa-user-plus me-2"></i>Register to Book
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Services Section -->
+<section id="services" class="container mt-5">
+    <div class="text-center py-4">
+        <h2 class="fw-bold text-primary">Our Medical Services</h2>
+        <p class="text-muted fs-5">Comprehensive healthcare services tailored for CUET students and staff</p>
+    </div>
+    <div class="row">
+        {% for s in services %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card mb-4 shadow border-0 h-100 transition-hover">
+                <a href="{% url 'base:service_detail' s.id %}">
+                    {% if s.image %}
+                    <img src="{{ s.image.url }}" alt="{{ s.name }}" 
+                         style="height: 250px; object-fit: cover" class="card-img-top" />
+                    {% else %}
+                    <div class="card-img-top d-flex align-items-center justify-content-center bg-light" 
+                         style="height: 250px;">
+                        <i class="fas fa-stethoscope fa-3x text-primary"></i>
+                    </div>
+                    {% endif %}
+                </a>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-dark mb-2">
+                        <a href="{% url 'base:service_detail' s.id %}" 
+                           class="text-inherit text-dark text-decoration-none">
+                            {{ s.name }}
+                        </a>
+                    </h5>
+                    <p class="card-text text-muted flex-grow-1">
+                        {{ s.description|truncatechars:100|default:"Professional medical service for CUET community" }}
+                    </p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-primary">
+                                <i class="fas fa-user-md me-1"></i>
+                                {{ s.available_doctors.all.count }} Doctors
+                            </span>
+                            <span class="text-success fw-bold">Free for Students</span>
+                        </div>
+                        <a href="{% url 'base:service_detail' s.id %}" 
+                           class="btn btn-primary w-100 mt-2">
+                            <i class="fas fa-calendar-check me-2"></i> See Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-stethoscope fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No Services Available</h4>
+            <p class="text-muted">Medical services will be added soon.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Emergency Services -->
+<section class="container-fluid bg-light py-5 mt-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-primary">Emergency Services</h2>
+            <p class="text-muted fs-5">Immediate medical assistance for CUET community</p>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-6 text-center mb-4">
+                <div class="card border-0 shadow-sm h-100 transition-hover">
+                    <div class="card-body">
+                        <div class="bg-danger rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="fas fa-ambulance fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Ambulance</h5>
+                        <p class="text-muted">24/7 Emergency ambulance service</p>
+                        <span class="badge bg-success">Available</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center mb-4">
+                <div class="card border-0 shadow-sm h-100 transition-hover">
+                    <div class="card-body">
+                        <div class="bg-danger rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="fas fa-tint fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Blood Bank</h5>
+                        <p class="text-muted">Emergency blood transfusion</p>
+                        <span class="badge bg-success">Live</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center mb-4">
+                <div class="card border-0 shadow-sm h-100 transition-hover">
+                    <div class="card-body">
+                        <div class="bg-warning rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="fas fa-first-aid fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">First Aid</h5>
+                        <p class="text-muted">Immediate medical assistance</p>
+                        <span class="badge bg-success">24/7</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center mb-4">
+                <div class="card border-0 shadow-sm h-100 transition-hover">
+                    <div class="card-body">
+                        <div class="bg-info rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px;">
+                            <i class="fas fa-phone-alt fa-2x text-white"></i>
+                        </div>
+                        <h5 class="fw-bold">Emergency Contact</h5>
+                        <p class="text-muted">Direct helpline for emergencies</p>
+                        <span class="badge bg-success">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action - Enhanced Visibility -->
+<section class="container mt-5">
+    <div class="row d-flex align-items-center bg-primary bg-gradient rounded-3 p-5 text-white" 
+         style="background: linear-gradient(135deg, #8db5f0ff 0%, #7b37e7ff 100%); border: 3px solid #FFD700;">
+        <div class="col-lg-8">
+            <h2 class="fw-bold mb-3 text-white" style="font-size: 2.5rem;">Ready to Get Started?</h2>
+            <p class="fs-4 mb-4 text-white" style="font-weight: 500; line-height: 1.6;">
+                Join thousands of CUET students who trust our medical services for their healthcare needs. 
+                <span class="d-block mt-2" style="color: #FFD700; font-weight: 600;">
+                    Register now and experience quality healthcare at CUET Medical Center.
+                </span>
+            </p>
+            
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                {% if not request.user.is_authenticated %}
+                <a href="{% url 'userauths:sign-up' %}?type=Patient" class="btn btn-warning btn-lg" style="background: #FFD700; border: none; color: #000; font-weight: 600;">
+                    <i class="fas fa-user-graduate me-2"></i>Student Registration
+                </a>
+                {% endif %}
+                <a href="#services" class="btn btn-outline-light btn-lg" style="border: 2px solid #FFD700; color: #FFD700; font-weight: 500;">
+                    <i class="fas fa-stethoscope me-2"></i>View All Services
+                </a>
+                {% if request.user.is_authenticated %}
+                <a href="{% if request.user.user_type == 'Patient' %}{% url 'patient:dashboard' %}{% else %}{% url 'doctor:dashboard' %}{% endif %}" 
+                   class="btn btn-success btn-lg" style="background: #28a745; border: none; font-weight: 600;">
+                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-4 text-center">
+            <i class="fas fa-hospital fa-6x" style="color: #FFD700; opacity: 0.9;"></i>
+        </div>
+    </div>
+</section>
+
+<!-- CUET Features -->
+<section class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-4 text-center mb-4">
+            <div class="card border-0 shadow-sm h-100 transition-hover">
+                <div class="card-body">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h5 class="fw-bold">Secure & Private</h5>
+                    <p class="text-muted">Your medical records are completely secure and confidential</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card border-0 shadow-sm h-100 transition-hover">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                    <h5 class="fw-bold">24/7 Access</h5>
+                    <p class="text-muted">Access your medical records and book appointments anytime</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center mb-4">
+            <div class="card border-0 shadow-sm h-100 transition-hover">
+                <div class="card-body">
+                    <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+                    <h5 class="fw-bold">Student Focused</h5>
+                    <p class="text-muted">Designed specifically for CUET students' healthcare needs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.transition-hover {
+    transition: all 0.3s ease;
+}
+
+.transition-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #1a3358ff 0%, #0e0222ff 100%) !important;
+}
+
+.rounded-3 {
+    border-radius: 1rem !important;
+}
+
+.card {
+    border-radius: 0.75rem;
+}
+
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.badge {
+    transition: all 0.2s ease;
+}
+
+.text-truncate-line-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* CUET Yellow Color */
+.cuet-yellow {
+    color: #FFD700 !important;
+}
+
+.text-white {
+    color: #FFFFFF !important;
+}
+
+/* Doctor slots styling */
+.slots-section .badge {
+    cursor: default;
+}
+</style>
+
+{% endblock content %}

@@ -1,0 +1,150 @@
+{% extends 'partials/base.html' %} 
+{% block content %}
+<section class="pt-5 pb-5" style="background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row mt-0 mt-md-4">
+            {% include 'doctor/sidebar.html' %}
+            <div class="col-lg-9 col-md-8 col-12">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-0 pt-4 pb-3">
+                        <h4 class="mb-0 fw-bold" style="color: #002147;">
+                            <i class="fas fa-calendar-alt me-2"></i>Appointments
+                        </h4>
+                        <p class="mb-0 text-muted small mt-2">Manage your upcoming appointments</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        {% if appointments %}
+                            {% for a in appointments %}
+                            <div class="card border shadow-sm mb-3 rounded-3 overflow-hidden hover-card" 
+                                 style="transition: all 0.3s ease;">
+                                <a href="{% url 'doctor:appointment_detail' a.appointment_id %}" 
+                                   class="text-decoration-none">
+                                    <div class="card-body p-4">
+                                        <!-- Header: ID and Status -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 class="mb-0 fw-bold" style="color: #002147;">
+                                                <i class="fas fa-file-medical me-2"></i>
+                                                #{{ a.appointment_id }}
+                                            </h6>
+                                            <span class="badge px-3 py-2
+                                                {% if a.status == 'Scheduled' %} bg-success
+                                                {% elif a.status == 'Cancelled' %} bg-danger
+                                                {% elif a.status == 'Pending' %} bg-warning text-dark
+                                                {% else %} bg-secondary {% endif %}">
+                                                {{ a.status }}
+                                            </span>
+                                        </div>
+
+                                        <hr class="my-3" style="border-color: #dee2e6;">
+
+                                        <!-- Patient & Service Info -->
+                                        <div class="row mb-3">
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1 small text-muted">
+                                                    <i class="fas fa-user-injured me-2"></i>Patient
+                                                </p>
+                                                <p class="mb-0 fw-semibold" style="color: #002147;">
+                                                    {{ a.patient.full_name }}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1 small text-muted">
+                                                    <i class="fas fa-stethoscope me-2"></i>Service
+                                                </p>
+                                                <p class="mb-0 fw-semibold" style="color: #002147;">
+                                                    {{ a.service.name }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Time Slot -->
+                                        <div class="mb-3 p-3 rounded-3" style="background-color: #f8f9fa;">
+                                            <p class="mb-1 small text-muted">
+                                                <i class="fas fa-clock me-2"></i>Scheduled Time
+                                            </p>
+                                            {% if a.slot %}
+                                                <p class="mb-0 fw-semibold" style="color: #002147;">
+                                                    {{ a.slot.date|date:"M d, Y" }} | 
+                                                    {{ a.slot.start_time|time:"h:i A" }} - {{ a.slot.end_time|time:"h:i A" }}
+                                                    {% if a.slot.is_booked %}
+                                                        <span class="badge bg-danger ms-2">Booked</span>
+                                                    {% else %}
+                                                        <span class="badge bg-success ms-2">Available</span>
+                                                    {% endif %}
+                                                </p>
+                                            {% else %}
+                                                <p class="mb-0 text-muted">No slot assigned</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <!-- Issue & Symptoms -->
+                                        <div class="row mb-3">
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1 small text-muted">
+                                                    <i class="fas fa-notes-medical me-2"></i>Issue
+                                                </p>
+                                                <p class="mb-0 text-dark">{{ a.issues|truncatewords:8 }}</p>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <p class="mb-1 small text-muted">
+                                                    <i class="fas fa-heartbeat me-2"></i>Symptoms
+                                                </p>
+                                                <p class="mb-0 text-dark">{{ a.symptoms|truncatewords:8 }}</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Footer: Booked Date & Action -->
+                                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                            <p class="mb-0 small text-muted">
+                                                <i class="fas fa-calendar-plus me-2"></i>
+                                                Booked: {{ a.created_at|date:"M d, Y - h:i A"|default:"N/A" }}
+                                            </p>
+                                            <button class="btn btn-sm px-4 py-2 fw-semibold" 
+                                                    style="background-color: #002147; color: white; border: none; border-radius: 6px;">
+                                                View Details <i class="fas fa-arrow-right ms-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <div class="mb-4">
+                                    <i class="fas fa-calendar-times fa-5x" style="color: #dee2e6;"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2" style="color: #002147;">No Appointments Yet</h5>
+                                <p class="text-muted">You don't have any pending appointments at the moment.</p>
+                                <p class="text-muted small">Completed appointments are automatically archived.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-card {
+        border: 1px solid #dee2e6;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 33, 71, 0.15) !important;
+        border-color: #002147;
+    }
+
+    .hover-card a {
+        color: inherit;
+    }
+
+    .hover-card .btn:hover {
+        background-color: #003d82 !important;
+        transform: translateX(2px);
+    }
+</style>
+
+{% endblock content %}

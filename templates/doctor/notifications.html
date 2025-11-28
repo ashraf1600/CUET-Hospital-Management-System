@@ -1,0 +1,83 @@
+{% extends 'partials/base.html' %} 
+{% block content %}
+<section class="pt-5 pb-5" style="background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row mt-0 mt-md-4">
+            {% include 'doctor/sidebar.html' %}
+
+            <div class="col-lg-9 col-md-8 col-12">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-0 pt-4 pb-3">
+                        <h4 class="mb-0 fw-bold" style="color: #002147;">
+                            <i class="fas fa-bell me-2"></i>Notifications
+                        </h4>
+                        <p class="mb-0 text-muted small mt-2">You have {{notifications.count}} unread notification(s)</p>
+                    </div>
+                    
+                    <div class="card-body p-0">
+                        {% if notifications %}
+                            <ul class="list-group list-group-flush">
+                                {% for n in notifications %}
+                                <li class="list-group-item border-0 border-bottom p-4 hover-bg-light" style="transition: background-color 0.2s ease;">
+                                    <div class="d-flex align-items-start">
+                                        <!-- Notification Icon -->
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                                 style="width: 50px; height: 50px; background-color: rgba(0, 33, 71, 0.1);">
+                                                <i class="fas fa-bell" style="color: #002147; font-size: 1.2rem;"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- Notification Content -->
+                                        <div class="flex-grow-1 ms-3">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="mb-1 fw-bold" style="color: #002147;">{{n.type}}</h6>
+                                                <span class="badge bg-primary bg-opacity-10 text-primary">New</span>
+                                            </div>
+
+                                            <p class="mb-2 text-muted small">
+                                                <i class="fas fa-calendar-alt me-2"></i>
+                                                {{n.date|date:"M d, Y - h:i A"}}
+                                            </p>
+
+                                            <a class="btn btn-sm px-3 py-2 fw-semibold" 
+                                               href="{% url 'doctor:mark_noti_seen' n.id %}"
+                                               style="background-color: #002147; color: white; border: none; border-radius: 6px; transition: all 0.2s ease;">
+                                                <i class="fas fa-check me-2"></i>Mark as Seen
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-bell-slash fa-4x mb-3" style="color: #dee2e6;"></i>
+                                <h5 class="text-muted">No New Notifications</h5>
+                                <p class="text-muted">You're all caught up! Check back later for updates.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .hover-bg-light:hover {
+        background-color: #f8f9fa !important;
+    }
+
+    .btn-sm:hover {
+        background-color: #003d82 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 33, 71, 0.2);
+    }
+
+    .list-group-item:last-child {
+        border-bottom: none !important;
+    }
+</style>
+
+{% endblock content %}

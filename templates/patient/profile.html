@@ -1,0 +1,226 @@
+{% extends 'partials/base.html' %} 
+{% block content %}
+
+<section class="pt-5 pb-5">
+    <div class="container">
+        <div class="row mt-0 mt-md-4">
+            {% include 'patient/sidebar.html' %}
+
+            <div class="col-lg-9 col-md-8 col-12">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0 fw-bold">Student Profile</h4>
+                    <span class="badge bg-primary">CUET Student</span>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form class="row" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <!-- Profile Image -->
+                            <div class="col-12 mb-4 text-center">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    {% if patient.image %}
+                                        <img src="{{ patient.image.url }}" 
+                                             class="rounded-circle me-4" 
+                                             style="width: 100px; height: 100px; object-fit: cover;" 
+                                             alt="Profile Image" />
+                                    {% else %}
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-4"
+                                             style="width: 100px; height: 100px;">
+                                            <i class="fas fa-user fa-2x text-secondary"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="text-start">
+                                        <label class="form-label fw-bold">Profile Avatar</label>
+                                        <input type="file" class="form-control" name="image" accept="image/*" />
+                                        <div class="form-text">Upload your profile picture (JPG, PNG, JPEG)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Student Information Section -->
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3 border-bottom pb-2">
+                                    <i class="fas fa-graduation-cap me-2"></i>Student Information
+                                </h6>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Student ID *</label>
+                                <input type="text" name="student_id" value="{{ patient.student_id }}" 
+                                       class="form-control bg-light" readonly />
+                                <div class="form-text">Your CUET Student ID (Cannot be changed)</div>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Department *</label>
+                                <input type="text" name="department" value="{{ patient.department }}" 
+                                       class="form-control bg-light" readonly />
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="first_name" value="{{ patient.first_name }}" 
+                                       class="form-control" placeholder="Enter your first name" required />
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" value="{{ patient.last_name }}" 
+                                       class="form-control" placeholder="Enter your last name" required />
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Hall *</label>
+                                <select name="hall" class="form-select" required>
+                                   <option value="">Select Hall</option>
+<option value="Kazi Nazrul Islam Hall" {% if patient.hall == "Kazi Nazrul Islam Hall" %}selected{% endif %}>Kazi Nazrul Islam Hall</option>
+<option value="Shaheed Shah Hall" {% if patient.hall == "Shaheed Shah Hall" %}selected{% endif %}>Shaheed Shah Hall</option>
+<option value="Shaheed Tarek Huda Hall" {% if patient.hall == "Shaheed Tarek Huda Hall" %}selected{% endif %}>Shaheed Tarek Huda Hall</option>
+<option value="Dr QK Hall" {% if patient.hall == "Dr QK Hall" %}selected{% endif %}>Dr QK Hall</option>
+<option value="Abu Sayed Hall" {% if patient.hall == "Abu Sayed Hall" %}selected{% endif %}>Abu Sayed Hall</option>
+<option value="MJH Hall" {% if patient.hall == "MJH Hall" %}selected{% endif %}>MJH Hall</option>
+<option value="Sufia Kamal Hall" {% if patient.hall == "Sufia Kamal Hall" %}selected{% endif %}>Sufia Kamal Hall</option>
+<option value="Shamsun Nahar Hall" {% if patient.hall == "Shamsun Nahar Hall" %}selected{% endif %}>Shamsun Nahar Hall</option>
+<option value="Tapashi Rabeya Hall" {% if patient.hall == "Tapashi Rabeya Hall" %}selected{% endif %}>Tapashi Rabeya Hall</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Room No *</label>
+                                <input type="text" name="room_no" value="{{ patient.room_no }}" 
+                                       class="form-control" placeholder="e.g., 101, 201A" required />
+                            </div>
+
+                            <!-- Personal Information Section -->
+                            <div class="col-12 mt-4">
+                                <h6 class="text-primary mb-3 border-bottom pb-2">
+                                    <i class="fas fa-user me-2"></i>Personal Information
+                                </h6>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" name="email" value="{{ patient.email }}" 
+                                       class="form-control bg-light" readonly />
+                                <div class="form-text">CUET email address (Cannot be changed)</div>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Mobile Number *</label>
+                                <input type="text" name="mobile" value="{{ patient.mobile }}" 
+                                       class="form-control" placeholder="+8801XXXXXXXXX" required />
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Gender *</label>
+                                <select name="gender" class="form-select" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male" {% if patient.gender == "Male" %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if patient.gender == "Female" %}selected{% endif %}>Female</option>
+                                    <option value="Other" {% if patient.gender == "Other" %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Date of Birth *</label>
+                                <input type="date" name="dob" value="{{ formatted_dob }}" 
+                                       class="form-control" required />
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Blood Group</label>
+                                <select name="blood_group" class="form-select">
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+" {% if patient.blood_group == "A+" %}selected{% endif %}>A+</option>
+                                    <option value="A-" {% if patient.blood_group == "A-" %}selected{% endif %}>A-</option>
+                                    <option value="B+" {% if patient.blood_group == "B+" %}selected{% endif %}>B+</option>
+                                    <option value="B-" {% if patient.blood_group == "B-" %}selected{% endif %}>B-</option>
+                                    <option value="AB+" {% if patient.blood_group == "AB+" %}selected{% endif %}>AB+</option>
+                                    <option value="AB-" {% if patient.blood_group == "AB-" %}selected{% endif %}>AB-</option>
+                                    <option value="O+" {% if patient.blood_group == "O+" %}selected{% endif %}>O+</option>
+                                    <option value="O-" {% if patient.blood_group == "O-" %}selected{% endif %}>O-</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-6 mb-3">
+                                <label class="form-label">Address</label>
+                                <input type="text" name="address" value="{{ patient.address }}" 
+                                       class="form-control" placeholder="Your current address" />
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12 mt-4">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{% url 'patient:dashboard' %}" class="btn btn-outline-secondary me-md-2">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Current Information Card -->
+                <div class="card mt-4 border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Current Profile Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Full Name:</strong> {{ patient.first_name }} {{ patient.last_name }}</p>
+                                <p><strong>Student ID:</strong> {{ patient.student_id }}</p>
+                                <p><strong>Department:</strong> {{ patient.department }}</p>
+                                <p><strong>Hall & Room:</strong> {{ patient.hall }} - Room {{ patient.room_no }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Email:</strong> {{ patient.email }}</p>
+                                <p><strong>Mobile:</strong> {{ patient.mobile }}</p>
+                                <p><strong>Gender:</strong> {{ patient.gender }}</p>
+                                <p><strong>Blood Group:</strong> {{ patient.blood_group|default:"Not specified" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.border-bottom {
+    border-color: #dee2e6 !important;
+}
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+</style>
+
+{% endblock content %}

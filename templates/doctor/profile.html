@@ -1,0 +1,141 @@
+{% extends 'partials/base.html' %} 
+{% block content %}
+<section class="pt-5 pb-5" style="background-color: #f8f9fa;">
+    <div class="container">
+        <div class="row mt-0 mt-md-4">
+            {% include 'doctor/sidebar.html' %}
+
+            <div class="col-lg-9 col-md-8 col-12">
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-white border-0 pt-4 pb-3">
+                        <h4 class="mb-0 fw-bold" style="color: #002147;">
+                            <i class="fas fa-user-edit me-2"></i>Edit Profile
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form class="row g-3" enctype="multipart/form-data" method="POST">
+                            {% csrf_token %}
+                            
+                            <!-- Profile Avatar -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold" style="color: #002147;">
+                                    Profile Avatar
+                                </label>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if doctor.image %}
+                                    <img src="{{doctor.image.url}}" alt="avatar" class="rounded-circle shadow-sm" 
+                                         style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #002147;">
+                                    {% else %}
+                                    <div class="rounded-circle shadow-sm d-flex align-items-center justify-content-center" 
+                                         style="width: 80px; height: 80px; background-color: #002147; color: white;">
+                                        <i class="fas fa-user fa-2x"></i>
+                                    </div>
+                                    {% endif %}
+                                    <input type="file" class="form-control" name="image" style="max-width: 400px;" />
+                                </div>
+                            </div>
+
+                            <hr class="my-3" style="border-color: #dee2e6;">
+
+                            <!-- Personal Information Section -->
+                            <div class="col-12">
+                                <h6 class="fw-bold mb-3" style="color: #002147;">
+                                    <i class="fas fa-id-card me-2"></i>Personal Information
+                                </h6>
+                            </div>
+
+                            <div class="col-lg-12 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Full Name</label>
+                                <input type="text" name="full_name" value="{{doctor.full_name}}" 
+                                       class="form-control" placeholder="Enter full name" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Email Address</label>
+                                <input type="email" name="email" value="{{doctor.user.email}}" readonly 
+                                       class="form-control bg-light" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                                <small class="text-muted">Email cannot be changed</small>
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Mobile Number</label>
+                                <input type="text" name="mobile" value="{{doctor.mobile}}" 
+                                       class="form-control" placeholder="Enter mobile number" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Bio</label>
+                                <input type="text" name="bio" value="{{doctor.bio}}" 
+                                       class="form-control" placeholder="Brief description about yourself" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Country</label>
+                                <input type="text" name="country" value="{{doctor.country}}" 
+                                       class="form-control" placeholder="Enter country" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <hr class="my-3" style="border-color: #dee2e6;">
+
+                            <!-- Professional Information Section -->
+                            <div class="col-12">
+                                <h6 class="fw-bold mb-3" style="color: #002147;">
+                                    <i class="fas fa-user-md me-2"></i>Professional Information
+                                </h6>
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Specialization</label>
+                                <input type="text" name="specialization" value="{{doctor.specialization}}" 
+                                       class="form-control" placeholder="e.g., Cardiology" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Qualifications</label>
+                                <input type="text" name="qualifications" value="{{doctor.qualifications}}" 
+                                       class="form-control" placeholder="e.g., MBBS, MD" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">Years of Experience</label>
+                                <input type="text" name="years_of_experience" value="{{doctor.years_of_experience}}" 
+                                       class="form-control" placeholder="e.g., 10" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <div class="col-lg-6 mb-2">
+                                <label class="form-label fw-semibold" style="color: #002147;">
+                                    Next Available Appointment Date
+                                </label>
+                                <input type="date" name="next_available_appointment_date" 
+                                       value="{{formatted_next_available_appointment_date}}" 
+                                       class="form-control" 
+                                       style="border-color: #dee2e6; padding: 12px;" />
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-lg px-5 py-3 fw-semibold shadow-sm" 
+                                        style="background-color: #002147; color: white; border: none; border-radius: 8px;">
+                                    <i class="fas fa-check-circle me-2"></i>Save Changes
+                                </button>
+                                <a href="{% url 'doctor:dashboard' %}" class="btn btn-outline-secondary btn-lg px-5 py-3 fw-semibold ms-2" 
+                                   style="border-radius: 8px;">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

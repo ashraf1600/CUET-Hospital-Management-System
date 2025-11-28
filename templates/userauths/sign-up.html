@@ -1,0 +1,240 @@
+{% extends 'partials/base.html' %} 
+{% block content %}
+
+<section class="container d-flex flex-column mt-5">
+    <div class="row align-items-center justify-content-center g-0 h-lg-100 py-8">
+        <div class="col-lg-7 col-md-10 py-8 py-xl-0">
+            <div class="card shadow">
+                <div class="card-body p-6">
+                    <div class="mb-4 text-center">
+                        <h1 class="mb-1 fw-bold">CUET Hospital Registration</h1>
+                        <span>
+                            Already have an account?
+                            <a href="{% url 'userauths:sign-in' %}" class="ms-1"> Sign In </a>
+                        </span>
+                    </div>
+
+                    <!-- Registration Type Selection -->
+                    <div class="text-center mb-4">
+                        <div class="btn-group w-100" role="group">
+                            <a href="?type=Patient" class="btn {% if user_type == 'Patient' or not user_type %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="fas fa-user-graduate me-2"></i>Student Registration
+                            </a>
+                            <a href="?type=Doctor" class="btn {% if user_type == 'Doctor' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                <i class="fas fa-user-md me-2"></i>Doctor Registration
+                            </a>
+                        </div>
+                    </div>
+
+                    <form class="needs-validation" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- Student Registration Form -->
+                        {% if user_type == 'Patient' or not user_type %}
+                        <div class="student-form">
+                            <h5 class="text-primary mb-4"><i class="fas fa-graduation-cap me-2"></i>Student Information</h5>
+                            
+                            <!-- Student ID -->
+                            <div class="mb-3">
+                                <label class="form-label">Student ID *</label>
+                                {{form.student_id}}
+                                <div class="form-text">e.g., 2104096 </div>
+                            </div>
+                            
+                            <!-- First Name & Last Name -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">First Name *</label>
+                                        {{form.first_name}}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Last Name *</label>
+                                        {{form.last_name}}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- CUET Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Department *</label>
+                                        {{form.department}}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Hall *</label>
+                                        {{form.hall}}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Room No *</label>
+                                        {{form.room_no}}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Blood Group *</label>
+                                        {{form.blood_group}}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Personal Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Gender *</label>
+                                        {{form.gender}}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Date of Birth *</label>
+                                        {{form.dob}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Doctor Registration Form -->
+                        {% else %}
+                        <div class="doctor-form">
+                            <h5 class="text-primary mb-4"><i class="fas fa-user-md me-2"></i>Doctor Information</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Full Name *</label>
+                                {{form.full_name}}
+                                <div class="form-text">e.g., Dr. John Doe</div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Specialization *</label>
+                                        {{form.specialization}}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Qualifications *</label>
+                                        {{form.qualifications}}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Years of Experience *</label>
+                                {{form.years_of_experience}}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Common Fields for Both -->
+                        <h5 class="text-primary mt-4 mb-3"><i class="fas fa-envelope me-2"></i>Account Information</h5>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address *</label>
+                            {{form.email}}
+                            <div class="form-text">
+                                {% if user_type == 'Patient' or not user_type %}
+                                Use your CUET email (e.g., StudentID@student.cuet.ac.bd)
+                                {% else %}
+                                Use your official email (e.g., name@cuet.ac.bd)
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mobile Number *</label>
+                            {{form.mobile}}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Password *</label>
+                                    {{form.password1}}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm Password *</label>
+                                    {{form.password2}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Verification Notice -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Account Verification Required:</strong> 
+                            Your account will be verified by admin before you can login. 
+                            You'll receive an email notification once verified.
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                {% if user_type == 'Patient' or not user_type %}
+                                <i class="fas fa-user-graduate me-2"></i>Register as Student
+                                {% else %}
+                                <i class="fas fa-user-md me-2"></i>Register as Doctor
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.btn-group .btn {
+    border-radius: 0;
+}
+.btn-group .btn:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+.btn-group .btn:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.alert {
+    border-left: 4px solid;
+}
+</style>
+
+{% endblock content %}

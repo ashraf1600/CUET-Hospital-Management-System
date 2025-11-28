@@ -1,0 +1,799 @@
+{% extends 'partials/base.html' %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row mt-0 mt-md-4">
+        <!-- Sidebar -->
+        <div class="col-lg-3 col-md-4 col-12">
+            {% include 'patient/sidebar.html' %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 col-md-8 col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1 fw-bold text-dark">
+                        <i class="fas fa-book-medical text-primary me-2"></i>Medical E-Booklet
+                    </h4>
+                    <p class="text-muted mb-0">Your complete medical history in digital notebook format</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-secondary fs-6">
+                        {{ completed_appointments.count }} Medical Records
+                    </span>
+                </div>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if completed_appointments %}
+                <!-- E-Booklet Notebook with Pagination -->
+                <div class="card shadow border-0 handwritten-notebook">
+                    <div class="card-body p-4">
+                        <!-- Pagination Controls -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <button id="prev-page" class="btn btn-handwritten-outline" disabled>
+                                    <i class="fas fa-chevron-left me-1"></i> Previous
+                                </button>
+                            </div>
+                            <div class="text-center">
+                                <span id="page-indicator" class="fw-bold text-dark handwritten-indicator">
+                                    Page <span id="current-page">1</span> of <span id="total-pages">{{ completed_appointments.count }}</span>
+                                </span>
+                                <div class="small text-muted">
+                                    Record <span id="current-record">1</span> of {{ completed_appointments.count }}
+                                </div>
+                            </div>
+                            <div>
+                                <button id="next-page" class="btn btn-handwritten-outline">
+                                    Next <i class="fas fa-chevron-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Appointment Pages Container -->
+                        <div id="appointment-pages">
+                            {% for appointment in completed_appointments %}
+                            <!-- Each Appointment as a Page -->
+                            <div class="handwritten-page bg-white p-4 border rounded shadow-sm {% if forloop.counter != 1 %}d-none{% endif %}" 
+                                 data-page="{{ forloop.counter }}">
+                                
+                                <!-- Hospital Header with Logo -->
+                                <div class="hospital-header text-center mb-4 border-bottom pb-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-2 text-start">
+                                            <div class="cuet-logo-placeholder">
+                                                <div class="logo-circle bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center">
+                                                    <span class="fw-bold">CUET</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-8">
+                                            <h4 class="hospital-name mb-1 handwritten-title">CUET MEDICAL CENTER</h4>
+                                            <p class="hospital-subtitle mb-0 handwritten-subtitle">Chittagong University of Engineering & Technology</p>
+                                            <p class="hospital-department handwritten-department">Department of Health Services</p>
+                                        </div>
+                                        <div class="col-2 text-end">
+                                            <div class="record-badge">
+                                                <span class="badge bg-light text-dark border">RECORD</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Patient & Doctor Information -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <div class="info-section patient-info handwritten-info">
+                                            <h6 class="section-title handwritten-section-title">
+                                                <i class="fas fa-user me-2"></i>PATIENT INFORMATION
+                                            </h6>
+                                            <table class="handwritten-table">
+                                                <tr>
+                                                    <td class="field-label">Name:</td>
+                                                    <td class="field-value">{{ request.user.get_full_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Age:</td>
+                                                    <td class="field-value">{{ request.user.patient.age }} years</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Gender:</td>
+                                                    <td class="field-value">{{ request.user.patient.gender }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Blood Group:</td>
+                                                    <td class="field-value">{{ request.user.patient.blood_group|default:"Not specified" }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Record ID:</td>
+                                                    <td class="field-value">{{ appointment.appointment_id }}</td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-section doctor-info handwritten-info">
+                                            <h6 class="section-title handwritten-section-title">
+                                                <i class="fas fa-user-md me-2"></i>DOCTOR INFORMATION
+                                            </h6>
+                                            <table class="handwritten-table">
+                                                <tr>
+                                                    <td class="field-label">Doctor:</td>
+                                                    <td class="field-value">Dr. {{ appointment.doctor.full_name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Department:</td>
+                                                    <td class="field-value">{{ appointment.service.name }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Date:</td>
+                                                    <td class="field-value">
+                                                        {% if appointment.slot %}
+                                                            {{ appointment.slot.date }}
+                                                        {% else %}
+                                                            Date not specified
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Time:</td>
+                                                    <td class="field-value">
+                                                        {% if appointment.slot %}
+                                                            {{ appointment.slot.start_time }}
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="field-label">Status:</td>
+                                                    <td class="field-value">
+                                                        <span class="badge bg-success handwritten-badge">COMPLETED</span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 1. Prescription Section -->
+                                <div class="section mb-4 handwritten-section">
+                                    <h6 class="section-title handwritten-section-title">
+                                        <span class="rx-symbol me-2">℞</span>
+                                        PRESCRIPTION
+                                    </h6>
+                                    <div class="section-content handwritten-content prescription-content">
+                                        {% with prescription=appointment.prescription_set.first %}
+                                            {% if prescription and prescription.medications %}
+                                                <div class="prescription-text handwritten-text">
+                                                    {{ prescription.medications|linebreaks }}
+                                                </div>
+                                                {% if prescription.notes %}
+                                                <div class="prescription-notes mt-3 pt-2 border-top">
+                                                    <strong>Doctor's Notes:</strong>
+                                                    <div class="handwritten-text notes-text">
+                                                        {{ prescription.notes }}
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="text-center py-3 empty-section">
+                                                    <i class="fas fa-prescription-bottle fa-2x mb-2"></i>
+                                                    <p class="text-muted mb-0 handwritten-empty">No prescription provided</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+
+                                <!-- 2. Lab Tests Section -->
+                                <div class="section mb-4 handwritten-section">
+                                    <h6 class="section-title handwritten-section-title">
+                                        <i class="fas fa-flask me-2"></i>
+                                        LABORATORY TESTS
+                                    </h6>
+                                    <div class="section-content handwritten-content">
+                                        {% with lab_tests=appointment.labtest_set.all %}
+                                            {% if lab_tests %}
+                                                <div class="lab-tests-container">
+                                                    {% for lab_test in lab_tests %}
+                                                    <div class="lab-test-item mb-3 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
+                                                        <div class="row">
+                                                            <div class="col-md-3">
+                                                                <strong class="handwritten-strong">Test Name:</strong><br>
+                                                                <span class="handwritten-text">{{ lab_test.test_name }}</span>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <strong class="handwritten-strong">Description:</strong><br>
+                                                                <span class="handwritten-text">{{ lab_test.description|default:"-" }}</span>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <strong class="handwritten-strong">Result:</strong><br>
+                                                                {% if lab_test.result %}
+                                                                    <span class="handwritten-text text-success">{{ lab_test.result }}</span>
+                                                                {% else %}
+                                                                    <span class="handwritten-text text-muted">Pending</span>
+                                                                {% endif %}
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <strong class="handwritten-strong">Status:</strong><br>
+                                                                {% if lab_test.result %}
+                                                                    <span class="badge bg-success handwritten-badge">Done</span>
+                                                                {% else %}
+                                                                    <span class="badge bg-warning handwritten-badge">Pending</span>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center py-3 empty-section">
+                                                    <i class="fas fa-vial fa-2x mb-2"></i>
+                                                    <p class="text-muted mb-0 handwritten-empty">No laboratory tests conducted</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+
+                                <!-- 3. Medical Report Section -->
+                                <div class="section mb-4 handwritten-section">
+                                    <h6 class="section-title handwritten-section-title">
+                                        <i class="fas fa-file-medical me-2"></i>
+                                        MEDICAL REPORT
+                                    </h6>
+                                    <div class="section-content handwritten-content">
+                                        {% with medical_record=appointment.medicalrecord_set.first %}
+                                            {% if medical_record %}
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <strong class="handwritten-strong">Diagnosis:</strong>
+                                                        <div class="handwritten-text-area diagnosis-box mt-1">
+                                                            {{ medical_record.diagnosis|linebreaks }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <strong class="handwritten-strong">Treatment Plan:</strong>
+                                                        <div class="handwritten-text-area treatment-box mt-1">
+                                                            {{ medical_record.treatment|linebreaks }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center py-3 empty-section">
+                                                    <i class="fas fa-stethoscope fa-2x mb-2"></i>
+                                                    <p class="text-muted mb-0 handwritten-empty">No medical report available</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+
+                                <!-- Patient Reported Information -->
+                                <div class="section handwritten-section">
+                                    <h6 class="section-title handwritten-section-title">
+                                        <i class="fas fa-notes-medical me-2"></i>
+                                        PATIENT REPORTED INFORMATION
+                                    </h6>
+                                    <div class="section-content handwritten-content">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong class="handwritten-strong">Symptoms:</strong>
+                                                <div class="handwritten-text-area symptoms-box mt-1">
+                                                    {% if appointment.symptoms %}
+                                                        {{ appointment.symptoms|linebreaks }}
+                                                    {% else %}
+                                                        <span class="text-muted handwritten-empty">No symptoms reported</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong class="handwritten-strong">Health Issues:</strong>
+                                                <div class="handwritten-text-area issues-box mt-1">
+                                                    {% if appointment.issues %}
+                                                        {{ appointment.issues|linebreaks }}
+                                                    {% else %}
+                                                        <span class="text-muted handwritten-empty">No issues reported</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Doctor Signature -->
+                                <div class="doctor-signature mt-4 pt-3 border-top text-end">
+                                    <div class="signature-line d-inline-block text-start">
+                                        <div class="signature-underline mb-1"></div>
+                                        <p class="signature-text mb-0 handwritten-signature">
+                                            Dr. {{ appointment.doctor.full_name }}<br>
+                                            <small class="text-muted">{{ appointment.service.name }} Department</small>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Page Footer -->
+                                <div class="page-footer border-top pt-3 mt-4 text-center">
+                                    <small class="text-muted handwritten-footer">
+                                        Medical Record {{ forloop.counter }} of {{ completed_appointments.count }} • 
+                                        CUET Medical Center • 
+                                        Generated on {% now "F j, Y" %}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Quick Navigation -->
+                        <div class="d-flex justify-content-center mt-4">
+                            <div class="btn-group handwritten-pagination" role="group">
+                                {% for appointment in completed_appointments %}
+                                <button type="button" class="btn btn-handwritten-page {% if forloop.first %}active{% endif %}" 
+                                        data-page="{{ forloop.counter }}">
+                                    {{ forloop.counter }}
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-center mt-4">
+                    <button onclick="window.print()" class="btn btn-handwritten-primary">
+                        <i class="fas fa-print me-2"></i>Print Current Page
+                    </button>
+                    <a href="{% url 'patient:dashboard' %}" class="btn btn-handwritten-secondary ms-2">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+
+            {% else %}
+                <!-- Empty State -->
+                <div class="card shadow border-0 text-center py-5 handwritten-empty-state">
+                    <div class="card-body">
+                        <div class="empty-prescription-icon mb-4">
+                            <span class="rx-empty">℞</span>
+                        </div>
+                        <h4 class="text-muted mb-3">Your Medical E-Booklet is Empty</h4>
+                        <p class="text-muted mb-4">
+                            Your completed medical appointments will appear here as handwritten-style records.<br>
+                            This is your personal medical notebook with doctor's prescription format.
+                        </p>
+                        <a href="{% url 'base:index' %}" class="btn btn-handwritten-primary">
+                            <i class="fas fa-calendar-plus me-2"></i>Schedule Your First Appointment
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Handwritten Style CSS -->
+<style>
+.handwritten-notebook {
+    background: #fefefe;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.handwritten-page {
+    background: #fff;
+    border: 1px solid #d4af37;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    min-height: 700px;
+    position: relative;
+    background-image: 
+        linear-gradient(#f9f9f9 1px, transparent 1px),
+        linear-gradient(90deg, #f9f9f9 1px, transparent 1px);
+    background-size: 20px 20px;
+    padding: 30px;
+}
+
+/* Hospital Header */
+.hospital-header {
+    border-bottom: 2px solid #d4af37 !important;
+    padding-bottom: 15px !important;
+}
+
+.logo-circle {
+    width: 60px;
+    height: 60px;
+    font-size: 12px;
+    border: 2px solid #0d6efd;
+}
+
+.handwritten-title {
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.handwritten-subtitle {
+    font-family: 'Georgia', serif;
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.handwritten-department {
+    font-family: 'Courier New', monospace;
+    color: #495057;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Information Sections */
+.handwritten-info {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    height: 100%;
+}
+
+.handwritten-section-title {
+    font-family: 'Georgia', serif;
+    font-weight: 600;
+    color: #2c3e50;
+    border-left: 4px solid #d4af37;
+    padding-left: 10px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.handwritten-table {
+    width: 100%;
+}
+
+.handwritten-table tr td {
+    padding: 3px 0;
+    vertical-align: top;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #495057;
+    width: 40%;
+    font-family: 'Georgia', serif;
+    font-size: 0.9rem;
+}
+
+.field-value {
+    color: #212529;
+    font-weight: 500;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Section Styles */
+.handwritten-section {
+    margin-bottom: 25px;
+}
+
+.handwritten-content {
+    background: rgba(248, 249, 250, 0.7);
+    border-radius: 4px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+}
+
+/* Prescription Styles */
+.rx-symbol {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d4af37;
+}
+
+.prescription-content {
+    background: rgba(255, 243, 205, 0.3);
+    border-left: 3px solid #d4af37;
+}
+
+.handwritten-text {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    line-height: 1.6;
+    white-space: pre-line;
+    color: #2c3e50;
+}
+
+.notes-text {
+    font-style: italic;
+    color: #6c757d;
+    border-left: 2px solid #6c757d;
+    padding-left: 10px;
+}
+
+/* Text Areas */
+.handwritten-text-area {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 12px;
+    min-height: 100px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.diagnosis-box {
+    border-left: 3px solid #dc3545;
+    background: rgba(220, 53, 69, 0.05);
+}
+
+.treatment-box {
+    border-left: 3px solid #198754;
+    background: rgba(25, 135, 84, 0.05);
+}
+
+.symptoms-box {
+    border-left: 3px solid #0dcaf0;
+    background: rgba(13, 202, 240, 0.05);
+}
+
+.issues-box {
+    border-left: 3px solid #6f42c1;
+    background: rgba(111, 66, 193, 0.05);
+}
+
+.handwritten-strong {
+    font-family: 'Georgia', serif;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.handwritten-badge {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+/* Empty States */
+.empty-section {
+    background: rgba(248, 249, 250, 0.5);
+    border-radius: 6px;
+}
+
+.handwritten-empty {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+}
+
+/* Doctor Signature */
+.doctor-signature {
+    margin-top: 30px;
+}
+
+.signature-underline {
+    width: 180px;
+    border-top: 2px solid #2c3e50;
+    margin-bottom: 5px;
+}
+
+.handwritten-signature {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 1.2rem;
+    color: #2c3e50;
+}
+
+.handwritten-footer {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+}
+
+/* Buttons */
+.btn-handwritten-outline {
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    background: white;
+    font-weight: 600;
+    font-family: 'Georgia', serif;
+    padding: 8px 16px;
+}
+
+.btn-handwritten-outline:hover {
+    background: #d4af37;
+    color: white;
+}
+
+.btn-handwritten-outline:disabled {
+    border-color: #6c757d;
+    color: #6c757d;
+    background: #f8f9fa;
+}
+
+.handwritten-indicator {
+    font-family: 'Georgia', serif;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.btn-handwritten-primary {
+    background: #d4af37;
+    color: white;
+    font-weight: 600;
+    font-family: 'Georgia', serif;
+    padding: 10px 20px;
+    border: none;
+}
+
+.btn-handwritten-primary:hover {
+    background: #b8941f;
+    color: white;
+}
+
+.btn-handwritten-secondary {
+    background: #6c757d;
+    color: white;
+    font-weight: 600;
+    font-family: 'Georgia', serif;
+    padding: 10px 20px;
+    border: none;
+}
+
+.btn-handwritten-secondary:hover {
+    background: #5c636a;
+    color: white;
+}
+
+.btn-handwritten-page {
+    background: white;
+    border: 1px solid #d4af37;
+    color: #495057;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    font-family: 'Georgia', serif;
+}
+
+.btn-handwritten-page.active {
+    background: #d4af37;
+    color: white;
+    border-color: #d4af37;
+}
+
+.handwritten-pagination {
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.handwritten-empty-state {
+    background: #fefefe;
+}
+
+.empty-prescription-icon {
+    font-size: 4rem;
+    color: #d4af37;
+}
+
+.rx-empty {
+    font-weight: bold;
+    font-family: 'Georgia', serif;
+}
+
+/* Print Styles */
+@media print {
+    .navbar, .sidebar, .btn, .alert, .handwritten-pagination, 
+    #prev-page, #next-page, .btn-group {
+        display: none !important;
+    }
+    
+    .handwritten-page {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 2px solid #000 !important;
+        background: white !important;
+    }
+    
+    .handwritten-page.d-none {
+        display: block !important;
+    }
+    
+    .hospital-header {
+        border-bottom: 2px solid #000 !important;
+    }
+    
+    .handwritten-notebook {
+        background: white !important;
+    }
+    
+    .handwritten-content {
+        background: white !important;
+        border: 1px solid #000 !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pages = document.querySelectorAll('.handwritten-page');
+    const pageBtns = document.querySelectorAll('.btn-handwritten-page');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const currentPageSpan = document.getElementById('current-page');
+    const currentRecordSpan = document.getElementById('current-record');
+    const totalPagesSpan = document.getElementById('total-pages');
+    
+    let currentPage = 1;
+    const totalPages = pages.length;
+    
+    // Initialize display
+    totalPagesSpan.textContent = totalPages;
+    
+    function updatePageDisplay() {
+        // Hide all pages
+        pages.forEach(page => {
+            page.classList.add('d-none');
+        });
+        
+        // Show current page
+        pages[currentPage - 1].classList.remove('d-none');
+        
+        // Update page indicator
+        currentPageSpan.textContent = currentPage;
+        currentRecordSpan.textContent = currentPage;
+        
+        // Update button states
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+        
+        // Update active page button
+        pageBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if (parseInt(btn.dataset.page) === currentPage) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
+    // Previous page button
+    prevBtn.addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            updatePageDisplay();
+        }
+    });
+    
+    // Next page button
+    nextBtn.addEventListener('click', function() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            updatePageDisplay();
+        }
+    });
+    
+    // Page number buttons
+    pageBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentPage = parseInt(this.dataset.page);
+            updatePageDisplay();
+        });
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowLeft' && currentPage > 1) {
+            currentPage--;
+            updatePageDisplay();
+        } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
+            currentPage++;
+            updatePageDisplay();
+        }
+    });
+});
+</script>
+
+{% endblock %}
