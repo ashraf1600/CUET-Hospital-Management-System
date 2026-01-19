@@ -18,10 +18,10 @@ A web-based hospital management system designed for CUET Medical Center.
 ## 📸 Screenshots
 
 ### Login Page
-![Login](login.png)
+![Login](front.png)
 
 ### Dashboard
-![Dashboard](dashboard.png)
+![Dashboard](fri.png)
 
 ---
 
