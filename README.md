@@ -17,7 +17,7 @@ A web-based hospital management system designed for CUET Medical Center.
 
 ## 📸 Screenshots
 
-### Login Page
+### Front Page
 ![Login](front.png)
 
 ### Dashboard
@@ -27,16 +27,17 @@ A web-based hospital management system designed for CUET Medical Center.
 
 ## 📄 Documentation
 
-📥 [Download Full Project Report](documents/Project_Report.pdf)
+📥 [Download Full Project Report](Project_Report.pdf)
 
 ---
 
 ## 🛠️ Technologies Used
 
 - HTML, CSS, JavaScript
-- Java / PHP
-- MySQL
+- Django fro backend
+- DBSqlite
 - Bootstrap
+- Google gemini API
 
 ---
 
