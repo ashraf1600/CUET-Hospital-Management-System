@@ -27,7 +27,7 @@ A web-based hospital management system designed for CUET Medical Center.
 
 ## 📄 Documentation
 
-📥 [Download Full Project Report](Project_Report.pdf)
+📥 [Download Full Project Report](2104085_2104096_2104097_Finale_SWE_report.pdf)
 
 ---
 
